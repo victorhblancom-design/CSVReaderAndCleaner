@@ -10,12 +10,17 @@ namespace DuplicateClientsCleanup
 {
     public class Helper
     {
-        public static void ParseCsv(Dictionary<string, List<ClientModel>> clientDict)
+        public static void ParseCsv(Dictionary<string, List<ClientModel>> clientDict, string csvPath = @"C:\rawnew.csv")
         {
             var csvTable = new DataTable();
             char delimiter = ',';
 
-            using (var csvReader = new CsvReader(new StreamReader(System.IO.File.OpenRead(@"C:\rawnew.csv")), true, delimiter: delimiter))
+            if (!File.Exists(csvPath))
+            {
+                throw new FileNotFoundException($"CSV file was not found: {csvPath}", csvPath);
+            }
+
+            using (var csvReader = new CsvReader(new StreamReader(File.OpenRead(csvPath)), true, delimiter: delimiter))
             {
                 csvTable.Load(csvReader);
             }
@@ -27,12 +32,12 @@ namespace DuplicateClientsCleanup
                     var reader = new ClientModel
                     {
                         ClientId = Convert.ToInt32(csvTable.Rows[i][1]),
-                        FirstName = csvTable.Rows[i][2].ToString(),
-                        MiddleName = csvTable.Rows[i][3].ToString(),
-                        LastCorpName = csvTable.Rows[i][4].ToString(),
-                        AccountNumber = csvTable.Rows[i][5].ToString(),
-                        IsLinked = csvTable.Rows[i][6].ToString(),
-                        LinkedAccountNumber = csvTable.Rows[i][7].ToString(),
+                        FirstName = Convert.ToString(csvTable.Rows[i][2]) ?? string.Empty,
+                        MiddleName = Convert.ToString(csvTable.Rows[i][3]) ?? string.Empty,
+                        LastCorpName = Convert.ToString(csvTable.Rows[i][4]) ?? string.Empty,
+                        AccountNumber = Convert.ToString(csvTable.Rows[i][5]) ?? string.Empty,
+                        IsLinked = Convert.ToString(csvTable.Rows[i][6]) ?? string.Empty,
+                        LinkedAccountNumber = Convert.ToString(csvTable.Rows[i][7]) ?? string.Empty,
                         TaskId = string.IsNullOrWhiteSpace(csvTable.Rows[i][8].ToString()) ? 0 : Convert.ToInt32(csvTable.Rows[i][8])
                     };
 
